@@ -3,17 +3,33 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const transporter = nodemailer.createTransport({
-  host: process.env.EMAIL_HOST,
-  port: process.env.EMAIL_PORT,
-  secure: false,
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASSWORD
-  }
-});
+// Check if email is configured
+const isEmailConfigured = process.env.EMAIL_USER && 
+  process.env.EMAIL_PASSWORD && 
+  process.env.EMAIL_USER !== 'your-email@gmail.com';
+
+let transporter = null;
+
+if (isEmailConfigured) {
+  transporter = nodemailer.createTransport({
+    host: process.env.EMAIL_HOST,
+    port: process.env.EMAIL_PORT,
+    secure: false,
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASSWORD
+    }
+  });
+} else {
+  console.warn('⚠️  Email is not configured. Email sending will be skipped.');
+}
 
 export const sendEmail = async (to, subject, html) => {
+  if (!isEmailConfigured) {
+    console.log(`📧 Email skipped (not configured): ${subject} to ${to}`);
+    return { skipped: true };
+  }
+
   try {
     const mailOptions = {
       from: process.env.EMAIL_FROM,
@@ -26,8 +42,9 @@ export const sendEmail = async (to, subject, html) => {
     console.log('Email sent: ' + info.messageId);
     return info;
   } catch (error) {
-    console.error('Email send error:', error);
-    throw new Error('Failed to send email');
+    console.error('Email send error:', error.message);
+    // Don't throw - just log and continue
+    return { error: error.message };
   }
 };
 
