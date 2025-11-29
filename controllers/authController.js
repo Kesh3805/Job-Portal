@@ -64,18 +64,36 @@ export const login = async (req, res, next) => {
       });
     }
 
+    // Check if account is locked
+    if (user.isLocked && user.isLocked()) {
+      const unlockAt = new Date(user.lockUntil).toISOString();
+      return res.status(423).json({
+        success: false,
+        message: `Account locked due to multiple failed login attempts. Try again after ${unlockAt}`
+      });
+    }
+
     // Check if password matches
     const isMatch = await user.comparePassword(password);
 
     if (!isMatch) {
+      // Increment failed login attempts and possibly lock account
+      try {
+        await user.incrementFailedLogins();
+      } catch (err) {
+        console.error('Failed to increment login attempts:', err);
+      }
+
       return res.status(401).json({
         success: false,
         message: 'Invalid credentials'
       });
     }
 
-    // Update last login
+    // Update last login and reset failed login attempts
     user.lastLogin = Date.now();
+    user.failedLoginAttempts = 0;
+    user.lockUntil = undefined;
     await user.save({ validateBeforeSave: false });
 
     // Send token response

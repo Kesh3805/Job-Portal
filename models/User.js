@@ -40,6 +40,12 @@ const userSchema = new mongoose.Schema({
   passwordResetToken: String,
   passwordResetExpire: Date,
   refreshToken: String,
+  // Account lockout fields
+  failedLoginAttempts: {
+    type: Number,
+    default: 0
+  },
+  lockUntil: Date,
   
   // Job Seeker specific fields
   bio: String,
@@ -107,6 +113,33 @@ userSchema.pre('save', async function(next) {
 // Compare password method
 userSchema.methods.comparePassword = async function(candidatePassword) {
   return await bcrypt.compare(candidatePassword, this.password);
+};
+
+// Check if account is currently locked
+userSchema.methods.isLocked = function() {
+  return !!(this.lockUntil && this.lockUntil > Date.now());
+};
+
+// Increment failed login attempts and lock account if necessary
+userSchema.methods.incrementFailedLogins = async function() {
+  const MAX_ATTEMPTS = 5;
+  const LOCK_TIME = 60 * 60 * 1000; // 1 hour
+
+  this.failedLoginAttempts = (this.failedLoginAttempts || 0) + 1;
+
+  if (this.failedLoginAttempts >= MAX_ATTEMPTS) {
+    this.lockUntil = Date.now() + LOCK_TIME;
+    this.failedLoginAttempts = 0; // reset counter after locking
+  }
+
+  await this.save({ validateBeforeSave: false });
+};
+
+// Reset failed attempts and unlock
+userSchema.methods.resetFailedLogins = async function() {
+  this.failedLoginAttempts = 0;
+  this.lockUntil = undefined;
+  await this.save({ validateBeforeSave: false });
 };
 
 // Generate email verification token
