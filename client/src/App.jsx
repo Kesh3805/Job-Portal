@@ -18,6 +18,7 @@ import ForgotPassword from './pages/auth/ForgotPassword';
 import ResetPassword from './pages/auth/ResetPassword';
 import Jobs from './pages/jobs/Jobs';
 import JobDetails from './pages/jobs/JobDetails';
+import RecommendedJobs from './pages/jobs/RecommendedJobs';
 import Dashboard from './pages/dashboard/Dashboard';
 import Profile from './pages/dashboard/Profile';
 import Applications from './pages/dashboard/Applications';
@@ -25,9 +26,16 @@ import SavedJobs from './pages/dashboard/SavedJobs';
 import MyJobs from './pages/dashboard/recruiter/MyJobs';
 import PostJob from './pages/dashboard/recruiter/PostJob';
 import CompanyProfile from './pages/dashboard/recruiter/CompanyProfile';
+import JobApplications from './pages/dashboard/recruiter/JobApplications';
 import Messages from './pages/dashboard/Messages';
+import Interviews from './pages/dashboard/Interviews';
+import InterviewCalendar from './pages/dashboard/InterviewCalendar';
 import Notifications from './pages/dashboard/Notifications';
 import AdminDashboard from './pages/admin/AdminDashboard';
+import AdminUsers from './pages/admin/AdminUsers';
+import AdminJobs from './pages/admin/AdminJobs';
+import AdminAnalytics from './pages/admin/AdminAnalytics';
+import AdminSettings from './pages/admin/AdminSettings';
 
 // Protected Route Component
 const ProtectedRoute = ({ children, allowedRoles }) => {
@@ -83,6 +91,14 @@ function AppContent() {
             <Route path="/reset-password/:token" element={<ResetPassword />} />
             <Route path="/jobs" element={<Jobs />} />
             <Route path="/jobs/:id" element={<JobDetails />} />
+            <Route
+              path="/jobs/recommended"
+              element={
+                <ProtectedRoute allowedRoles={['seeker']}>
+                  <RecommendedJobs />
+                </ProtectedRoute>
+              }
+            />
 
             {/* Protected Routes */}
             <Route
@@ -142,6 +158,14 @@ function AppContent() {
               }
             />
             <Route
+              path="/dashboard/jobs/:jobId/applications"
+              element={
+                <ProtectedRoute allowedRoles={['recruiter']}>
+                  <JobApplications />
+                </ProtectedRoute>
+              }
+            />
+            <Route
               path="/dashboard/messages"
               element={
                 <ProtectedRoute>
@@ -150,10 +174,66 @@ function AppContent() {
               }
             />
             <Route
+              path="/dashboard/interviews"
+              element={
+                <ProtectedRoute>
+                  <Interviews />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/dashboard/interview-calendar"
+              element={
+                <ProtectedRoute>
+                  <InterviewCalendar />
+                </ProtectedRoute>
+              }
+            />
+            <Route
               path="/dashboard/notifications"
               element={
                 <ProtectedRoute>
                   <Notifications />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/dashboard"
+              element={
+                <ProtectedRoute allowedRoles={['admin']}>
+                  <AdminDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/users"
+              element={
+                <ProtectedRoute allowedRoles={['admin']}>
+                  <AdminUsers />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/jobs"
+              element={
+                <ProtectedRoute allowedRoles={['admin']}>
+                  <AdminJobs />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/analytics"
+              element={
+                <ProtectedRoute allowedRoles={['admin']}>
+                  <AdminAnalytics />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/settings"
+              element={
+                <ProtectedRoute allowedRoles={['admin']}>
+                  <AdminSettings />
                 </ProtectedRoute>
               }
             />

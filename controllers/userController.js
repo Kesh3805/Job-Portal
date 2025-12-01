@@ -149,6 +149,38 @@ export const uploadResume = async (req, res, next) => {
   }
 };
 
+// @desc    Delete resume
+// @route   DELETE /api/users/resume
+// @access  Private (Seeker)
+export const deleteResume = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user.id);
+
+    if (!user.resume?.publicId) {
+      return res.status(404).json({
+        success: false,
+        message: 'No resume found'
+      });
+    }
+
+    // Delete resume file
+    const filePath = path.join(__dirname, '..', 'uploads', 'resumes', user.resume.publicId);
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
+    }
+
+    user.resume = undefined;
+    await user.save({ validateBeforeSave: false });
+
+    res.status(200).json({
+      success: true,
+      message: 'Resume deleted successfully'
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 // @desc    Save/unsave job
 // @route   PUT /api/users/saved-jobs/:jobId
 // @access  Private (Seeker)

@@ -57,7 +57,7 @@ app.use(helmet());
 // Global rate limiter (general API)
 const globalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
+  max: 500, // limit each IP to 500 requests per windowMs (increased for development)
   standardHeaders: true,
   legacyHeaders: false
 });
@@ -66,13 +66,17 @@ app.use(globalLimiter);
 // Static files for uploads
 app.use('/uploads', express.static('uploads'));
 
-// Apply stronger rate limiting to auth endpoints
+// Apply rate limiting to auth endpoints (lenient for /me checks)
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 10, // limit to 10 requests per window per IP for auth
+  max: 100, // limit to 100 requests per window per IP for auth (increased for /me checks)
   message: { success: false, message: 'Too many auth requests from this IP, please try again later.' },
   standardHeaders: true,
-  legacyHeaders: false
+  legacyHeaders: false,
+  skip: (req) => {
+    // Skip rate limiting for /me endpoint (auth checks happen frequently)
+    return req.path === '/me';
+  }
 });
 
 // Routes

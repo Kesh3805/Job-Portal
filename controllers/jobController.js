@@ -306,3 +306,47 @@ export const getJobStats = async (req, res, next) => {
     next(error);
   }
 };
+
+// @desc    Get recruiter's own jobs
+// @route   GET /api/jobs/my-jobs
+// @access  Private (Recruiter)
+export const getMyJobs = async (req, res, next) => {
+  try {
+    const { status, isApproved, page = 1, limit = 20 } = req.query;
+
+    const query = { postedBy: req.user.id };
+
+    if (status) query.status = status;
+    if (isApproved !== undefined) query.isApproved = isApproved === 'true';
+
+    const skip = (parseInt(page) - 1) * parseInt(limit);
+
+    const jobs = await Job.find(query)
+      .populate('company', 'name logo location')
+      .sort('-createdAt')
+      .skip(skip)
+      .limit(parseInt(limit));
+
+    // Get application counts for each job
+    const jobsWithCounts = await Promise.all(
+      jobs.map(async (job) => {
+        const applicationsCount = await Application.countDocuments({ job: job._id });
+        return {
+          ...job.toObject(),
+          applicationsCount
+        };
+      })
+    );
+
+    const total = await Job.countDocuments(query);
+
+    res.status(200).json({
+      success: true,
+      count: jobsWithCounts.length,
+      total,
+      data: jobsWithCounts
+    });
+  } catch (error) {
+    next(error);
+  }
+};

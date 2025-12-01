@@ -28,10 +28,14 @@ const Login = () => {
     try {
       await dispatch(login(formData)).unwrap();
       toast.success('Login successful!');
-      navigate('/dashboard');
+      
+      // Wait a bit for state to update before navigating
+      setTimeout(() => {
+        navigate('/dashboard', { replace: true });
+        setLoading(false);
+      }, 100);
     } catch (error) {
       toast.error(error || 'Login failed');
-    } finally {
       setLoading(false);
     }
   };

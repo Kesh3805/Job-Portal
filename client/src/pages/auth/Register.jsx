@@ -38,10 +38,14 @@ const Register = () => {
       const { confirmPassword, ...registerData } = formData;
       await dispatch(register(registerData)).unwrap();
       toast.success('Registration successful! Please verify your email.');
-      navigate('/dashboard');
+      
+      // Wait a bit for state to update before navigating
+      setTimeout(() => {
+        navigate('/dashboard', { replace: true });
+        setLoading(false);
+      }, 100);
     } catch (error) {
       toast.error(error || 'Registration failed');
-    } finally {
       setLoading(false);
     }
   };

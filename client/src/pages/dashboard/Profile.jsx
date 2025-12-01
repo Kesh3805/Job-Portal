@@ -1,15 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { getMe } from '../../features/auth/authSlice';
 import api from '../../utils/api';
 import { toast } from 'react-toastify';
 import Button from '../../components/common/Button';
 import Input from '../../components/common/Input';
 import Card from '../../components/common/Card';
 import Badge from '../../components/common/Badge';
+import ResumeViewerModal from '../../components/modals/ResumeViewerModal';
+import { FiEye, FiDownload, FiTrash2, FiUpload } from 'react-icons/fi';
 
 const Profile = () => {
   const { user } = useSelector((state) => state.auth);
+  const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
+  const [showResumeModal, setShowResumeModal] = useState(false);
+  const [uploadingResume, setUploadingResume] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -133,39 +139,78 @@ const Profile = () => {
     }
   };
 
-  const handleAvatarUpload = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    const formData = new FormData();
-    formData.append('avatar', file);
-
-    try {
-      await api.put('/users/avatar', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
-      toast.success('Avatar uploaded successfully!');
-      window.location.reload();
-    } catch (error) {
-      toast.error(error.response?.data?.message || 'Failed to upload avatar');
-    }
-  };
-
   const handleResumeUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
+
+    // Validate file type
+    const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+    if (!allowedTypes.includes(file.type)) {
+      toast.error('Please upload a PDF or Word document');
+      e.target.value = '';
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('File size must be less than 5MB');
+      e.target.value = '';
+      return;
+    }
 
     const formData = new FormData();
     formData.append('resume', file);
 
     try {
-      await api.put('/users/resume', formData, {
+      setUploadingResume(true);
+      const { data } = await api.put('/users/resume', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
       toast.success('Resume uploaded successfully!');
-      window.location.reload();
+      dispatch(getMe());
+      setUploadingResume(false);
     } catch (error) {
       toast.error(error.response?.data?.message || 'Failed to upload resume');
+      setUploadingResume(false);
+    }
+    // Clear the input
+    e.target.value = '';
+  };
+
+  const handleDeleteResume = async () => {
+    if (!window.confirm('Are you sure you want to delete your resume? This action cannot be undone.')) {
+      return;
+    }
+
+    try {
+      await api.delete('/users/resume');
+      toast.success('Resume deleted successfully!');
+      dispatch(getMe());
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Failed to delete resume');
+    }
+  };
+
+  const handleViewResume = () => {
+    setShowResumeModal(true);
+  };
+
+  const handleDownloadResume = async () => {
+    try {
+      const response = await fetch(user.resume.url);
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = user.resume.fileName || 'Resume.pdf';
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+      toast.success('Resume downloaded successfully!');
+    } catch (error) {
+      console.error('Download failed:', error);
+      toast.error('Failed to download resume');
     }
   };
 
@@ -210,28 +255,97 @@ const Profile = () => {
               </h3>
               
               {user?.resume?.url ? (
-                <div className="mb-4 p-3 bg-muted/50 rounded-lg border border-border">
-                  <a 
-                    href={user.resume.url} 
-                    target="_blank" 
-                    rel="noopener noreferrer" 
-                    className="text-primary hover:text-primary/80 font-medium text-sm flex items-center gap-2"
+                <div className="space-y-3">
+                  <div className="p-3 bg-muted/50 rounded-lg border border-border">
+                    <p className="text-sm text-foreground font-medium mb-1">
+                      {user.resume.fileName || 'Resume.pdf'}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      Current resume on file
+                    </p>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-2">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={handleViewResume}
+                      className="w-full flex items-center justify-center gap-2"
+                    >
+                      <FiEye size={16} />
+                      View
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={handleDownloadResume}
+                      className="w-full flex items-center justify-center gap-2"
+                    >
+                      <FiDownload size={16} />
+                      Download
+                    </Button>
+                  </div>
+                  
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={handleDeleteResume}
+                    className="w-full flex items-center justify-center gap-2 text-red-500 border-red-500 hover:bg-red-500/10"
                   >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
-                    View Current Resume
-                  </a>
+                    <FiTrash2 size={16} />
+                    Delete Resume
+                  </Button>
+                  
+                  <div className="pt-3 border-t border-border">
+                    <label className="block">
+                      <Button 
+                        variant="primary" 
+                        className="w-full" 
+                        as="span"
+                        disabled={uploadingResume}
+                      >
+                        <FiUpload className="mr-2" size={16} />
+                        {uploadingResume ? 'Uploading...' : 'Replace Resume'}
+                      </Button>
+                      <input 
+                        type="file" 
+                        accept=".pdf,.doc,.docx" 
+                        onChange={handleResumeUpload} 
+                        className="hidden"
+                        disabled={uploadingResume}
+                      />
+                    </label>
+                    <p className="text-xs text-muted-foreground mt-2 text-center">
+                      PDF or Word (Max 5MB)
+                    </p>
+                  </div>
                 </div>
               ) : (
-                <p className="text-sm text-muted-foreground mb-4 italic">No resume uploaded yet</p>
+                <div className="space-y-3">
+                  <p className="text-sm text-muted-foreground mb-4 italic">No resume uploaded yet</p>
+                  <label className="block">
+                    <Button 
+                      variant="primary" 
+                      className="w-full" 
+                      as="span"
+                      disabled={uploadingResume}
+                    >
+                      <FiUpload className="mr-2" size={16} />
+                      {uploadingResume ? 'Uploading...' : 'Upload Resume'}
+                    </Button>
+                    <input 
+                      type="file" 
+                      accept=".pdf,.doc,.docx" 
+                      onChange={handleResumeUpload} 
+                      className="hidden"
+                      disabled={uploadingResume}
+                    />
+                  </label>
+                  <p className="text-xs text-muted-foreground text-center">
+                    PDF or Word (Max 5MB)
+                  </p>
+                </div>
               )}
-              
-              <label className="block">
-                <Button variant="outline" className="w-full" as="span">
-                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
-                  Upload New Resume
-                </Button>
-                <input type="file" accept=".pdf,.doc,.docx" onChange={handleResumeUpload} className="hidden" />
-              </label>
             </Card>
           )}
         </div>
@@ -488,9 +602,20 @@ const Profile = () => {
           </form>
         </div>
       </div>
+
+      {/* Resume Viewer Modal */}
+      {showResumeModal && user?.resume?.url && (
+        <ResumeViewerModal
+          isOpen={showResumeModal}
+          onClose={() => setShowResumeModal(false)}
+          resumeUrl={user.resume.url}
+          candidateName="Your"
+        />
+      )}
     </div>
     </div>
   );
 };
+
 
 export default Profile;

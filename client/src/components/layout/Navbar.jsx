@@ -33,6 +33,11 @@ const Navbar = () => {
                 Post Job
               </Link>
             )}
+            {isAuthenticated && user?.role === 'admin' && (
+              <Link to="/admin/dashboard" className="text-muted-foreground hover:text-primary font-medium transition-colors">
+                Admin Panel
+              </Link>
+            )}
           </div>
 
           <div className="flex items-center space-x-4">
@@ -67,11 +72,24 @@ const Navbar = () => {
                     <div className="px-4 py-2 border-b border-border mb-2">
                       <p className="text-sm font-bold text-foreground">{user?.name}</p>
                       <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
+                      <span className={`inline-block mt-1 text-xs px-2 py-0.5 rounded-full ${
+                        user?.role === 'admin' ? 'bg-red-500/10 text-red-500' :
+                        user?.role === 'recruiter' ? 'bg-blue-500/10 text-blue-500' :
+                        'bg-green-500/10 text-green-500'
+                      }`}>
+                        {user?.role}
+                      </span>
                     </div>
                     <Link to="/dashboard" className="block px-4 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors">
                       <FiUser className="inline mr-2" />
                       Dashboard
                     </Link>
+                    {user?.role === 'admin' && (
+                      <Link to="/admin/dashboard" className="block px-4 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors">
+                        <FiUser className="inline mr-2" />
+                        Admin Panel
+                      </Link>
+                    )}
                     <Link to="/dashboard/profile" className="block px-4 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors">
                       <FiUser className="inline mr-2" />
                       Profile

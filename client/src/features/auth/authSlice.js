@@ -77,10 +77,12 @@ const authSlice = createSlice({
         state.loading = false;
         state.isAuthenticated = true;
         state.user = action.payload.user;
+        state.initialized = true;
       })
       .addCase(register.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+        state.isAuthenticated = false;
       })
       // Login
       .addCase(login.pending, (state) => {
@@ -91,10 +93,12 @@ const authSlice = createSlice({
         state.loading = false;
         state.isAuthenticated = true;
         state.user = action.payload.user;
+        state.initialized = true;
       })
       .addCase(login.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+        state.isAuthenticated = false;
       })
       // Logout
       .addCase(logout.fulfilled, (state) => {

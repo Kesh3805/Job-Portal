@@ -4,6 +4,7 @@ import {
   updateProfile,
   uploadAvatar,
   uploadResume,
+  deleteResume,
   toggleSaveJob,
   getSavedJobs,
   getDashboardStats
@@ -19,6 +20,7 @@ router.put('/saved-jobs/:jobId', protect, authorize('seeker'), toggleSaveJob);
 router.put('/profile', protect, updateProfile);
 router.put('/avatar', protect, upload.single('avatar'), uploadAvatar);
 router.put('/resume', protect, authorize('seeker'), upload.single('resume'), uploadResume);
+router.delete('/resume', protect, authorize('seeker'), deleteResume);
 router.get('/:id', getUserProfile);
 
 export default router;
