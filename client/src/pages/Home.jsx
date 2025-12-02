@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FiSearch, FiTrendingUp, FiBriefcase, FiUsers, FiMapPin, FiDollarSign, FiCheckCircle, FiArrowRight, FiClock, FiCode, FiLayers, FiCpu } from 'react-icons/fi';
+import { motion } from 'framer-motion';
 import api from '../utils/api';
 import Button from '../components/common/Button';
 import Card from '../components/common/Card';
 import Badge from '../components/common/Badge';
+import ParticleBackground from '../components/common/ParticleBackground';
 
 const Home = () => {
   const navigate = useNavigate();
@@ -32,46 +34,80 @@ const Home = () => {
   };
 
   const categories = [
-    { name: 'Development', icon: <FiCode />, count: '1.2k+ Jobs', color: 'text-blue-500' },
+    { name: 'Technology', icon: <FiCode />, count: '1.2k+ Jobs', color: 'text-blue-500' },
     { name: 'Design', icon: <FiLayers />, count: '800+ Jobs', color: 'text-purple-500' },
     { name: 'Marketing', icon: <FiTrendingUp />, count: '500+ Jobs', color: 'text-green-500' },
     { name: 'Engineering', icon: <FiCpu />, count: '300+ Jobs', color: 'text-orange-500' },
+    { name: 'Sales', icon: <FiUsers />, count: '650+ Jobs', color: 'text-red-500' },
+    { name: 'Finance', icon: <FiDollarSign />, count: '420+ Jobs', color: 'text-emerald-500' },
+    { name: 'Healthcare', icon: <FiBriefcase />, count: '890+ Jobs', color: 'text-pink-500' },
+    { name: 'HR', icon: <FiCheckCircle />, count: '340+ Jobs', color: 'text-indigo-500' },
   ];
 
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
+      {/* Particle Background */}
+      <ParticleBackground />
+      
       {/* Hero Section */}
       <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden">
         {/* Background Elements */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full max-w-7xl pointer-events-none">
-          <div className="absolute top-20 left-10 w-72 h-72 bg-primary/20 rounded-full blur-[100px] animate-pulse-slow"></div>
-          <div className="absolute bottom-20 right-10 w-96 h-96 bg-secondary/20 rounded-full blur-[100px] animate-pulse-slow delay-1000"></div>
+          <div className="absolute top-20 left-10 w-72 h-72 bg-primary/20 rounded-full blur-[100px] animate-float"></div>
+          <div className="absolute bottom-20 right-10 w-96 h-96 bg-purple-500/20 rounded-full blur-[100px] animate-float delay-200"></div>
+          <div className="absolute top-1/2 left-1/3 w-80 h-80 bg-pink-500/15 rounded-full blur-[100px] animate-float delay-400"></div>
         </div>
 
         <div className="container mx-auto px-4 relative z-10">
-          <div className="max-w-4xl mx-auto text-center">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-medium mb-8 animate-fade-in">
+          <motion.div 
+            className="max-w-4xl mx-auto text-center"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+          >
+            <motion.div 
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-medium mb-8 hover-lift"
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.2, duration: 0.5 }}
+            >
               <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
               </span>
-              The #1 Platform for Tech Talent
-            </div>
+              #1 Platform for Job Seekers
+            </motion.div>
             
-            <h1 className="font-display text-5xl md:text-7xl lg:text-8xl font-bold mb-8 leading-[1.1] tracking-tight animate-slide-up">
-              Find your next <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-purple-500 to-secondary animate-gradient-x">
-                breakthrough
+            <motion.h1 
+              className="font-display text-5xl md:text-7xl lg:text-8xl font-bold mb-8 leading-[1.1] tracking-tight"
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3, duration: 0.8 }}
+            >
+              Find Your Dream <br />
+              <span className="text-gradient animate-gradient">
+                Career
               </span>
-            </h1>
+            </motion.h1>
             
-            <p className="text-xl text-muted-foreground mb-12 max-w-2xl mx-auto leading-relaxed animate-slide-up delay-100">
-              Connect with forward-thinking companies and discover opportunities that define the future of technology.
-            </p>
+            <motion.p 
+              className="text-xl text-muted-foreground mb-12 max-w-2xl mx-auto leading-relaxed"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.5, duration: 0.8 }}
+            >
+              Connect with top companies across all industries and discover opportunities that match your skills and aspirations.
+            </motion.p>
 
             {/* Search Bar */}
-            <form onSubmit={handleSearch} className="glass p-2 rounded-2xl max-w-3xl mx-auto flex flex-col md:flex-row gap-2 animate-slide-up delay-200 shadow-glow border-white/10">
-              <div className="flex-1 flex items-center px-4 py-3 bg-background/50 rounded-xl focus-within:bg-background focus-within:ring-2 focus-within:ring-primary/20 transition-all border border-transparent focus-within:border-primary/20">
+            <motion.form 
+              onSubmit={handleSearch} 
+              className="glass p-2 rounded-2xl max-w-3xl mx-auto flex flex-col md:flex-row gap-2 shadow-xl hover-lift"
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6, duration: 0.8 }}
+            >
+              <div className="flex-1 flex items-center px-4 py-3 bg-background/50 rounded-xl focus-within:bg-background focus-within:ring-2 focus-within:ring-primary/20 transition-all">
                 <FiSearch className="text-muted-foreground mr-3" size={20} />
                 <input
                   type="text"
@@ -81,7 +117,7 @@ const Home = () => {
                   onChange={(e) => setSearchQuery({ ...searchQuery, keyword: e.target.value })}
                 />
               </div>
-              <div className="flex-1 flex items-center px-4 py-3 bg-background/50 rounded-xl focus-within:bg-background focus-within:ring-2 focus-within:ring-primary/20 transition-all border border-transparent focus-within:border-primary/20">
+              <div className="flex-1 flex items-center px-4 py-3 bg-background/50 rounded-xl focus-within:bg-background focus-within:ring-2 focus-within:ring-primary/20 transition-all">
                 <FiMapPin className="text-muted-foreground mr-3" size={20} />
                 <input
                   type="text"
@@ -91,24 +127,36 @@ const Home = () => {
                   onChange={(e) => setSearchQuery({ ...searchQuery, location: e.target.value })}
                 />
               </div>
-              <Button type="submit" size="lg" className="md:w-auto w-full h-auto py-3 px-8 text-lg shadow-glow hover:shadow-glow-lg">
-                Search
+              <Button type="submit" size="lg" className="md:w-auto w-full hover-glow relative overflow-hidden group">
+                <span className="relative z-10">Search Jobs</span>
+                <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-pink-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               </Button>
-            </form>
+            </motion.form>
 
-            <div className="mt-10 flex flex-wrap items-center justify-center gap-4 text-sm text-muted-foreground animate-fade-in delay-300">
+            <motion.div 
+              className="mt-10 flex flex-wrap items-center justify-center gap-4 text-sm text-muted-foreground"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.8, duration: 0.8 }}
+            >
               <span>Trending:</span>
-              {['Remote', 'AI Engineer', 'Product Design', 'Blockchain'].map((tag) => (
-                <Link 
-                  key={tag} 
-                  to={`/jobs?keyword=${tag}`} 
-                  className="px-3 py-1 rounded-full bg-secondary/50 hover:bg-secondary hover:text-secondary-foreground transition-colors border border-border"
+              {['Remote', 'Marketing Manager', 'Data Analyst', 'Sales Executive', 'Nurse', 'Software Engineer', 'UI Designer', 'Accountant'].map((tag, index) => (
+                <motion.div
+                  key={tag}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.9 + index * 0.1 }}
                 >
-                  {tag}
-                </Link>
+                  <Link 
+                    to={`/jobs?keyword=${tag}`} 
+                    className="px-3 py-1 rounded-full bg-secondary hover:bg-primary/10 hover:text-primary transition-all border border-border hover-scale inline-block"
+                  >
+                    {tag}
+                  </Link>
+                </motion.div>
               ))}
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
         </div>
       </section>
 
@@ -122,10 +170,17 @@ const Home = () => {
               { label: 'Job Seekers', value: '100K+' },
               { label: 'Hired', value: '25K+' },
             ].map((stat, index) => (
-              <div key={index} className="text-center">
-                <div className="font-display text-3xl md:text-4xl font-bold text-foreground mb-1">{stat.value}</div>
+              <motion.div 
+                key={index} 
+                className="text-center hover-lift"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1, duration: 0.6 }}
+              >
+                <div className="font-display text-3xl md:text-4xl font-bold text-gradient mb-1">{stat.value}</div>
                 <div className="text-muted-foreground font-medium">{stat.label}</div>
-              </div>
+              </motion.div>
             ))}
           </div>
         </div>
@@ -148,15 +203,23 @@ const Home = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {categories.map((cat, index) => (
-              <Link key={index} to={`/jobs?category=${cat.name}`} className="group">
-                <Card glass hover className="p-6 h-full border-border/50 bg-card/50">
-                  <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-6 bg-background border border-border shadow-sm group-hover:scale-110 transition-transform duration-300`}>
-                    <span className={`text-2xl ${cat.color}`}>{cat.icon}</span>
-                  </div>
-                  <h3 className="text-xl font-bold text-foreground mb-2 group-hover:text-primary transition-colors">{cat.name}</h3>
-                  <p className="text-muted-foreground text-sm">{cat.count}</p>
-                </Card>
-              </Link>
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1, duration: 0.6 }}
+              >
+                <Link to={`/jobs?category=${cat.name}`} className="group block">
+                  <Card glass hover className="p-6 h-full border-border/50 bg-card/50 hover-lift hover-glow">
+                    <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-6 bg-background border border-border shadow-sm group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 animate-glow`}>
+                      <span className={`text-2xl ${cat.color}`}>{cat.icon}</span>
+                    </div>
+                    <h3 className="text-xl font-bold text-foreground mb-2 group-hover:text-primary transition-colors">{cat.name}</h3>
+                    <p className="text-muted-foreground text-sm">{cat.count}</p>
+                  </Card>
+                </Link>
+              </motion.div>
             ))}
           </div>
         </div>
@@ -178,9 +241,16 @@ const Home = () => {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {featuredJobs.map((job) => (
-                <Link key={job._id} to={`/jobs/${job._id}`} className="group">
-                  <Card hover className="p-6 h-full bg-card border-border/50 hover:border-primary/30">
+              {featuredJobs.map((job, index) => (
+                <motion.div
+                  key={job._id}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.1, duration: 0.6 }}
+                >
+                  <Link to={`/jobs/${job._id}`} className="group block">
+                    <Card hover className="p-6 h-full bg-card border-border/50 hover:border-primary/30 hover-lift hover-glow">
                     <div className="flex items-start gap-5">
                       <div className="w-16 h-16 rounded-xl bg-background flex items-center justify-center overflow-hidden flex-shrink-0 border border-border shadow-sm group-hover:shadow-md transition-all">
                         {job.company?.logo?.url ? (
@@ -209,6 +279,7 @@ const Home = () => {
                     </div>
                   </Card>
                 </Link>
+              </motion.div>
               ))}
             </div>
           )}

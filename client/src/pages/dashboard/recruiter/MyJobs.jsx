@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Card from '../../../components/common/Card';
 import Button from '../../../components/common/Button';
 import { Link } from 'react-router-dom';
-import { FiBriefcase, FiPlus, FiUsers, FiEye, FiEdit, FiTrash2, FiCheckCircle, FiClock } from 'react-icons/fi';
+import { FiBriefcase, FiPlus, FiUsers, FiEye, FiEdit, FiTrash2, FiCheckCircle, FiClock, FiPause, FiPlay } from 'react-icons/fi';
 import api from '../../../utils/api';
 import { toast } from 'react-toastify';
 
@@ -33,7 +33,7 @@ const MyJobs = () => {
   };
 
   const handleDeleteJob = async (jobId) => {
-    if (!window.confirm('Are you sure you want to delete this job?')) return;
+    if (!window.confirm('Are you sure you want to delete this job? This action cannot be undone.')) return;
 
     try {
       await api.delete(`/jobs/${jobId}`);
@@ -41,6 +41,21 @@ const MyJobs = () => {
       fetchJobs();
     } catch (error) {
       toast.error('Failed to delete job');
+    }
+  };
+
+  const handleToggleStatus = async (jobId, currentStatus) => {
+    const newStatus = currentStatus === 'active' ? 'paused' : 'active';
+    const action = newStatus === 'active' ? 'activate' : 'pause';
+    
+    if (!window.confirm(`Are you sure you want to ${action} this job?`)) return;
+
+    try {
+      await api.put(`/jobs/${jobId}`, { status: newStatus });
+      toast.success(`Job ${action}d successfully`);
+      fetchJobs();
+    } catch (error) {
+      toast.error(`Failed to ${action} job`);
     }
   };
 
@@ -65,7 +80,7 @@ const MyJobs = () => {
 
         {/* Filters */}
         <div className="flex gap-2 mb-6">
-          {['all', 'active', 'closed'].map((status) => (
+          {['all', 'active', 'paused', 'closed'].map((status) => (
             <button
               key={status}
               onClick={() => setFilter(status)}
@@ -124,6 +139,8 @@ const MyJobs = () => {
                         <span className={`text-xs px-3 py-1 rounded-full font-medium ${
                           job.status === 'active' 
                             ? 'bg-blue-500/10 text-blue-500' 
+                            : job.status === 'paused'
+                            ? 'bg-orange-500/10 text-orange-500'
                             : 'bg-gray-500/10 text-gray-500'
                         }`}>
                           {job.status}
@@ -143,15 +160,15 @@ const MyJobs = () => {
                       <span>Posted {new Date(job.createdAt).toLocaleDateString()}</span>
                     </div>
 
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 flex-wrap">
                       <Link to={`/dashboard/jobs/${job._id}/applications`}>
                         <Button size="sm">
-                          <FiUsers className="mr-2" /> View Applications ({job.applicationsCount || 0})
+                          <FiUsers className="mr-2" /> Applications ({job.applicationsCount || 0})
                         </Button>
                       </Link>
                       <Link to={`/jobs/${job._id}`} target="_blank">
                         <Button size="sm" variant="outline">
-                          <FiEye className="mr-2" /> View Job
+                          <FiEye className="mr-2" /> View
                         </Button>
                       </Link>
                       <Link to={`/dashboard/edit-job/${job._id}`}>
@@ -159,6 +176,26 @@ const MyJobs = () => {
                           <FiEdit className="mr-2" /> Edit
                         </Button>
                       </Link>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleToggleStatus(job._id, job.status)}
+                        className={`${
+                          job.status === 'active' 
+                            ? 'text-orange-500 border-orange-500 hover:bg-orange-500/10' 
+                            : 'text-green-500 border-green-500 hover:bg-green-500/10'
+                        }`}
+                      >
+                        {job.status === 'active' ? (
+                          <>
+                            <FiPause className="mr-2" /> Pause
+                          </>
+                        ) : (
+                          <>
+                            <FiPlay className="mr-2" /> Activate
+                          </>
+                        )}
+                      </Button>
                       <Button
                         size="sm"
                         variant="outline"

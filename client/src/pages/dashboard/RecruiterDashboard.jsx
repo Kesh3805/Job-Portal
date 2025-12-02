@@ -3,8 +3,9 @@ import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import Card from '../../components/common/Card';
 import Button from '../../components/common/Button';
-import { FiBriefcase, FiUsers, FiEye, FiPlus } from 'react-icons/fi';
+import { FiBriefcase, FiUsers, FiEye, FiPlus, FiEdit, FiTrash2, FiPause, FiPlay } from 'react-icons/fi';
 import api from '../../utils/api';
+import { toast } from 'react-toastify';
 
 const RecruiterDashboard = () => {
   const { user } = useSelector((state) => state.auth);
@@ -40,6 +41,33 @@ const RecruiterDashboard = () => {
     } catch (error) {
       console.error('Failed to fetch dashboard data:', error);
       setLoading(false);
+    }
+  };
+
+  const handleDeleteJob = async (jobId) => {
+    if (!window.confirm('Are you sure you want to delete this job? This action cannot be undone.')) return;
+
+    try {
+      await api.delete(`/jobs/${jobId}`);
+      toast.success('Job deleted successfully');
+      fetchDashboardData();
+    } catch (error) {
+      toast.error('Failed to delete job');
+    }
+  };
+
+  const handleToggleStatus = async (jobId, currentStatus) => {
+    const newStatus = currentStatus === 'active' ? 'paused' : 'active';
+    const action = newStatus === 'active' ? 'activate' : 'pause';
+    
+    if (!window.confirm(`Are you sure you want to ${action} this job?`)) return;
+
+    try {
+      await api.put(`/jobs/${jobId}`, { status: newStatus });
+      toast.success(`Job ${action}d successfully`);
+      fetchDashboardData();
+    } catch (error) {
+      toast.error(`Failed to ${action} job`);
     }
   };
 
@@ -135,15 +163,44 @@ const RecruiterDashboard = () => {
                         </p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-4">
-                      <Link to={`/dashboard/jobs/${job._id}/applications`} className="text-right hover:text-primary transition-colors">
-                        <p className="text-sm font-medium text-foreground hover:text-primary">{job.applicationsCount || 0} Applications</p>
+                    <div className="flex items-center gap-2">
+                      <div className="text-right mr-2">
+                        <Link to={`/dashboard/jobs/${job._id}/applications`} className="hover:text-primary transition-colors">
+                          <p className="text-sm font-medium text-foreground hover:text-primary">{job.applicationsCount || 0} Applications</p>
+                        </Link>
                         <span className={`text-xs px-2 py-1 rounded-full ${
-                          job.status === 'active' ? 'bg-green-500/10 text-green-500' : 'bg-gray-500/10 text-gray-500'
+                          job.status === 'active' 
+                            ? 'bg-green-500/10 text-green-500' 
+                            : job.status === 'paused'
+                            ? 'bg-orange-500/10 text-orange-500'
+                            : 'bg-gray-500/10 text-gray-500'
                         }`}>
-                          {job.isApproved ? (job.status === 'active' ? 'Active' : 'Closed') : 'Pending Approval'}
+                          {job.isApproved ? job.status : 'Pending'}
                         </span>
+                      </div>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => handleToggleStatus(job._id, job.status)}
+                        className="text-muted-foreground hover:text-foreground"
+                        title={job.status === 'active' ? 'Pause Job' : 'Activate Job'}
+                      >
+                        {job.status === 'active' ? <FiPause size={18} /> : <FiPlay size={18} />}
+                      </Button>
+                      <Link to={`/dashboard/edit-job/${job._id}`}>
+                        <Button size="sm" variant="ghost" className="text-muted-foreground hover:text-foreground" title="Edit Job">
+                          <FiEdit size={18} />
+                        </Button>
                       </Link>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => handleDeleteJob(job._id)}
+                        className="text-red-500 hover:text-red-600"
+                        title="Delete Job"
+                      >
+                        <FiTrash2 size={18} />
+                      </Button>
                       <Link to={`/jobs/${job._id}`}>
                         <Button size="sm" variant="outline">View</Button>
                       </Link>

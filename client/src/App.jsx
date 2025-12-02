@@ -12,6 +12,7 @@ import Footer from './components/layout/Footer';
 
 // Pages
 import Home from './pages/Home';
+import Pricing from './pages/Pricing';
 import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
 import ForgotPassword from './pages/auth/ForgotPassword';
@@ -85,6 +86,7 @@ function AppContent() {
           <Routes>
             {/* Public Routes */}
             <Route path="/" element={<Home />} />
+            <Route path="/pricing" element={<Pricing />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />

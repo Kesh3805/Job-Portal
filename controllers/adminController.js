@@ -139,62 +139,6 @@ export const approveJob = async (req, res, next) => {
   }
 };
 
-// @desc    Get platform analytics
-// @route   GET /api/admin/analytics
-// @access  Private (Admin)
-export const getAnalytics = async (req, res, next) => {
-  try {
-    const totalUsers = await User.countDocuments();
-    const seekers = await User.countDocuments({ role: 'seeker' });
-    const recruiters = await User.countDocuments({ role: 'recruiter' });
-    const totalJobs = await Job.countDocuments();
-    const activeJobs = await Job.countDocuments({ status: 'active', isApproved: true });
-    const totalApplications = await Application.countDocuments();
-    const totalCompanies = await Company.countDocuments();
-
-    // Recent registrations (last 30 days)
-    const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
-    const recentUsers = await User.countDocuments({ createdAt: { $gte: thirtyDaysAgo } });
-    const recentJobs = await Job.countDocuments({ createdAt: { $gte: thirtyDaysAgo } });
-
-    // Applications by status
-    const applicationStats = await Application.aggregate([
-      {
-        $group: {
-          _id: '$status',
-          count: { $sum: 1 }
-        }
-      }
-    ]);
-
-    res.status(200).json({
-      success: true,
-      data: {
-        users: {
-          total: totalUsers,
-          seekers,
-          recruiters,
-          recentRegistrations: recentUsers
-        },
-        jobs: {
-          total: totalJobs,
-          active: activeJobs,
-          recentPosts: recentJobs
-        },
-        applications: {
-          total: totalApplications,
-          byStatus: applicationStats
-        },
-        companies: {
-          total: totalCompanies
-        }
-      }
-    });
-  } catch (error) {
-    next(error);
-  }
-};
-
 // @desc    Get single user details
 // @route   GET /api/admin/users/:id
 // @access  Private (Admin)
