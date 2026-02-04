@@ -1,17 +1,67 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import { FiMapPin, FiBriefcase, FiClock, FiDollarSign, FiBookmark } from 'react-icons/fi';
 import Card from '../common/Card';
 import Badge from '../common/Badge';
 import Button from '../common/Button';
+import api from '../../utils/api';
+import { toast } from 'react-toastify';
 
 const JobCard = ({ job }) => {
+  const { user } = useSelector((state) => state.auth);
+  const [isSaved, setIsSaved] = useState(false);
+  const [savingJob, setSavingJob] = useState(false);
+
+  useEffect(() => {
+    if (user && user.savedJobs) {
+      setIsSaved(user.savedJobs.includes(job._id));
+    }
+  }, [user, job._id]);
+
+  const handleToggleSave = async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!user) {
+      toast.info('Please login to save jobs');
+      return;
+    }
+
+    if (user.role !== 'seeker') {
+      toast.info('Only job seekers can save jobs');
+      return;
+    }
+
+    try {
+      setSavingJob(true);
+      await api.put(`/users/saved-jobs/${job._id}`);
+      setIsSaved(!isSaved);
+      toast.success(isSaved ? 'Job removed from saved list' : 'Job saved successfully');
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Failed to save job');
+    } finally {
+      setSavingJob(false);
+    }
+  };
+
   return (
     <Card className="relative group hover:shadow-2xl transition-all duration-300 border border-border/50 hover:border-primary/30">
       {/* Bookmark Button */}
-      <button className="absolute top-4 right-4 p-2 rounded-lg bg-secondary/80 backdrop-blur-sm hover:bg-primary hover:text-white transition-all">
-        <FiBookmark size={16} />
-      </button>
+      {user && user.role === 'seeker' && (
+        <button
+          onClick={handleToggleSave}
+          disabled={savingJob}
+          className={`absolute top-4 right-4 p-2 rounded-lg backdrop-blur-sm transition-all ${
+            isSaved
+              ? 'bg-primary text-white'
+              : 'bg-secondary/80 hover:bg-primary hover:text-white'
+          } ${savingJob ? 'opacity-50 cursor-not-allowed' : ''}`}
+          title={isSaved ? 'Remove from saved jobs' : 'Save job'}
+        >
+          <FiBookmark size={16} className={isSaved ? 'fill-current' : ''} />
+        </button>
+      )}
 
       {/* Company Logo & Title */}
       <div className="flex items-start gap-4 mb-4">
@@ -31,7 +81,7 @@ const JobCard = ({ job }) => {
             {job.title}
           </Link>
           <p className="text-sm text-muted-foreground">{job.company?.name || 'Company'}</p>
-          <Badge variant={job.status === 'active' ? 'success' : 'secondary'} className="text-xs mt-1">
+          <Badge variant={job.status === 'active' ? 'success' : 'secondary'} className="text-xs mt-1 capitalize">
             {job.status}
           </Badge>
         </div>
@@ -47,11 +97,11 @@ const JobCard = ({ job }) => {
           <span>{job.location}</span>
         </div>
         <div className="flex items-center gap-4">
-          <div className="flex items-center text-sm text-foreground">
+          <div className="flex items-center text-sm text-foreground capitalize">
             <FiBriefcase className="mr-2 text-purple-500" size={16} />
             <span>{job.employmentType}</span>
           </div>
-          <div className="flex items-center text-sm text-foreground">
+          <div className="flex items-center text-sm text-foreground capitalize">
             <FiClock className="mr-2 text-blue-500" size={16} />
             <span>{job.experienceLevel}</span>
           </div>
@@ -59,7 +109,7 @@ const JobCard = ({ job }) => {
         {job.salary?.min && (
           <div className="flex items-center text-sm text-green-600 font-semibold">
             <FiDollarSign className="mr-2" size={16} />
-            <span>${job.salary.min}k - ${job.salary.max}k / {job.salary.period}</span>
+            <span>${job.salary.min >= 1000 ? `${(job.salary.min / 1000).toFixed(0)}k` : job.salary.min} - ${job.salary.max >= 1000 ? `${(job.salary.max / 1000).toFixed(0)}k` : job.salary.max} / {job.salary.period}</span>
           </div>
         )}
       </div>
@@ -85,7 +135,7 @@ const JobCard = ({ job }) => {
         </span>
         <Link to={`/jobs/${job._id}`}>
           <Button size="sm" className="bg-primary hover:bg-primary/90 text-white">
-            Apply Now
+            View Details
           </Button>
         </Link>
       </div>

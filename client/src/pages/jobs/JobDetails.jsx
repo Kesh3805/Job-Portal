@@ -2,13 +2,14 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchJob } from '../../features/jobs/jobSlice';
+import { getMe } from '../../features/auth/authSlice';
 import api from '../../utils/api';
 import { toast } from 'react-toastify';
 import Card from '../../components/common/Card';
 import Button from '../../components/common/Button';
 import Badge from '../../components/common/Badge';
 import Input from '../../components/common/Input';
-import { FiMapPin, FiBriefcase, FiClock, FiDollarSign, FiCalendar, FiUsers, FiArrowLeft, FiSave, FiCheck } from 'react-icons/fi';
+import { FiMapPin, FiBriefcase, FiClock, FiDollarSign, FiCalendar, FiUsers, FiArrowLeft, FiBookmark, FiCheck } from 'react-icons/fi';
 
 const JobDetails = () => {
   const { id } = useParams();
@@ -21,12 +22,20 @@ const JobDetails = () => {
   const [coverLetter, setCoverLetter] = useState('');
   const [resume, setResume] = useState(null);
   const [applying, setApplying] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
+  const [savingJob, setSavingJob] = useState(false);
 
   useEffect(() => {
     if (id) {
       dispatch(fetchJob(id));
     }
   }, [dispatch, id]);
+
+  useEffect(() => {
+    if (user && user.savedJobs && currentJob) {
+      setIsSaved(user.savedJobs.includes(currentJob._id));
+    }
+  }, [user, currentJob]);
 
   const handleApply = async (e) => {
     e.preventDefault();
@@ -59,18 +68,28 @@ const JobDetails = () => {
     }
   };
 
-  const handleSaveJob = async () => {
+  const handleToggleSaveJob = async () => {
     if (!user) {
       toast.error('Please login to save jobs');
       navigate('/login');
       return;
     }
 
+    if (user.role !== 'seeker') {
+      toast.info('Only job seekers can save jobs');
+      return;
+    }
+
     try {
-      await api.post(`/users/save-job/${id}`);
-      toast.success('Job saved successfully!');
+      setSavingJob(true);
+      await api.put(`/users/saved-jobs/${id}`);
+      setIsSaved(!isSaved);
+      toast.success(isSaved ? 'Job removed from saved list' : 'Job saved successfully!');
+      dispatch(getMe()); // Refresh user data
     } catch (error) {
       toast.error(error.response?.data?.message || 'Failed to save job');
+    } finally {
+      setSavingJob(false);
     }
   };
 
@@ -137,9 +156,17 @@ const JobDetails = () => {
             </div>
             
             <div className="flex gap-3 w-full md:w-auto">
-              <Button variant="outline" onClick={handleSaveJob} className="flex-1 md:flex-none">
-                <FiSave className="mr-2" /> Save Job
-              </Button>
+              {user?.role === 'seeker' && (
+                <Button 
+                  variant="outline" 
+                  onClick={handleToggleSaveJob} 
+                  disabled={savingJob}
+                  className={`flex-1 md:flex-none ${isSaved ? 'bg-primary/10 border-primary text-primary' : ''}`}
+                >
+                  <FiBookmark className={`mr-2 ${isSaved ? 'fill-current' : ''}`} /> 
+                  {isSaved ? 'Saved' : 'Save Job'}
+                </Button>
+              )}
               {user?.role === 'seeker' && (
                 <Button onClick={() => setShowApplyModal(true)} className="flex-1 md:flex-none shadow-glow">
                   Apply Now

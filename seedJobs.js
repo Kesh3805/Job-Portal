@@ -738,50 +738,171 @@ const sampleJobs = [
   }
 ];
 
-const sampleCompanies = [
-  {
-    name: 'TechCorp Solutions',
-    description: 'Leading provider of enterprise software solutions',
-    website: 'https://techcorp.example.com',
-    industry: 'Technology',
-    size: '1000+',
-    location: {
-      address: '123 Tech Street',
-      city: 'New York',
-      state: 'NY',
-      country: 'USA'
-    },
-    foundedYear: 2010
-  },
-  {
-    name: 'InnovateSoft',
-    description: 'Innovative startup building next-generation web applications',
-    website: 'https://innovatesoft.example.com',
-    industry: 'Technology',
-    size: '11-50',
-    location: {
-      address: '456 Innovation Ave',
-      city: 'San Francisco',
-      state: 'CA',
-      country: 'USA'
-    },
-    foundedYear: 2018
-  },
-  {
-    name: 'CloudScale Inc',
-    description: 'Cloud infrastructure and DevOps services company',
-    website: 'https://cloudscale.example.com',
-    industry: 'Cloud Services',
-    size: '201-500',
-    location: {
-      address: '789 Cloud Lane',
-      city: 'Seattle',
-      state: 'WA',
-      country: 'USA'
-    },
-    foundedYear: 2015
+// Function to generate companies
+function generateCompanies() {
+  const companyNames = [
+    'TechCorp', 'InnovateSoft', 'CloudScale', 'DataDrive', 'CyberSafe', 'HealthPlus', 'EduTech', 'FinanceHub',
+    'RetailPro', 'LogisticsMaster', 'MediaWave', 'GreenEnergy', 'AutoTech', 'BioMed', 'AeroSpace',
+    'FoodieNetwork', 'TravelEase', 'RealtyGroup', 'FashionFirst', 'SportsPro', 'EntertainCo', 'MusicHub',
+    'GameStudio', 'SocialConnect', 'AdTech', 'MarketGenius', 'SalesPro', 'ConsultCorp', 'LegalEagle',
+    'ArchDesign', 'BuildMaster', 'ManufactureX', 'ChemLab', 'PharmaTech', 'VetCare', 'AgriGrow',
+    'FisheryPro', 'MiningCorp', 'TextilePro', 'PaperMill', 'PrintMedia', 'PackagingPro', 'WasteManage',
+    'WaterWorks', 'PowerGrid', 'TelecomPlus', 'BroadcastNet', 'CableCo', 'SatelliteLink', 'WirelessHub',
+    'InternetPro', 'CloudNet', 'DataCenter', 'ServerFarm', 'HostingPlus', 'DomainKing', 'WebDesignPro',
+    'AppDevelopers', 'SoftwareSolutions', 'CodeFactory', 'DevShop', 'ProgrammersCo', 'TechHub',
+    'InnovationLab', 'StartupIncubator', 'VentureCapital', 'InvestmentGroup', 'BankingCorp', 'CreditUnion',
+    'InsuranceGroup', 'ReInsurePro', 'AssetManagement', 'WealthAdvisors', 'TaxConsultants', 'AuditFirm',
+    'AccountingPro', 'BookkeepingCo', 'PayrollMasters', 'HRSolutions', 'RecruitmentPro', 'TalentFinders',
+    'StaffingAgency', 'OutsourceCo', 'FreelanceHub', 'GigEconomy', 'RemoteWorkPro', 'CoWorkingSpace',
+    'OfficeSolutions', 'FacilityManage', 'PropertyManage', 'LandlordPro', 'TenantServices', 'HomeCare'
+  ];
+
+  const suffixes = ['Inc', 'LLC', 'Corp', 'Group', 'Solutions', 'Systems', 'Technologies', 'Enterprises', 'Partners', 'Associates'];
+  const industries = ['Technology', 'Healthcare', 'Finance', 'Education', 'Retail', 'Manufacturing', 'Consulting', 'Marketing', 'Engineering', 'Other'];
+  const sizes = ['1-10', '11-50', '51-200', '201-500', '501-1000', '1000+'];
+  const cities = [
+    'New York', 'Los Angeles', 'Chicago', 'Houston', 'Phoenix', 'Philadelphia', 'San Antonio', 'San Diego',
+    'Dallas', 'San Jose', 'Austin', 'Jacksonville', 'Fort Worth', 'Columbus', 'Charlotte', 'San Francisco',
+    'Indianapolis', 'Seattle', 'Denver', 'Washington', 'Boston', 'El Paso', 'Nashville', 'Detroit', 'Portland',
+    'Las Vegas', 'Memphis', 'Louisville', 'Baltimore', 'Milwaukee', 'Albuquerque', 'Tucson', 'Fresno',
+    'Sacramento', 'Kansas City', 'Mesa', 'Atlanta', 'Omaha', 'Colorado Springs', 'Raleigh', 'Miami',
+    'Virginia Beach', 'Oakland', 'Minneapolis', 'Tulsa', 'Arlington', 'Tampa', 'New Orleans'
+  ];
+  const states = ['NY', 'CA', 'IL', 'TX', 'AZ', 'PA', 'TX', 'CA', 'TX', 'CA', 'TX', 'FL', 'TX', 'OH', 'NC', 'CA',
+    'IN', 'WA', 'CO', 'DC', 'MA', 'TX', 'TN', 'MI', 'OR', 'NV', 'TN', 'KY', 'MD', 'WI', 'NM', 'AZ', 'CA',
+    'CA', 'MO', 'AZ', 'GA', 'NE', 'CO', 'NC', 'FL', 'VA', 'CA', 'MN', 'OK', 'TX', 'FL', 'LA'];
+
+  const companies = [];
+  for (let i = 0; i < 100; i++) {
+    const cityIndex = i % cities.length;
+    companies.push({
+      name: `${companyNames[i % companyNames.length]} ${suffixes[i % suffixes.length]}`,
+      description: `Professional services in ${industries[i % industries.length].toLowerCase()}`,
+      website: `https://${companyNames[i % companyNames.length].toLowerCase()}.example.com`,
+      industry: industries[i % industries.length],
+      size: sizes[i % sizes.length],
+      location: {
+        address: `${100 + i} Business St`,
+        city: cities[cityIndex],
+        state: states[cityIndex],
+        country: 'USA'
+      },
+      foundedYear: 2000 + (i % 24)
+    });
   }
-];
+  return companies;
+}
+
+const sampleCompanies = generateCompanies();
+
+// Function to generate jobs
+function generateJobs(numJobs, companies) {
+  const jobTitles = [
+    'Software Engineer', 'Senior Developer', 'Full Stack Developer', 'Frontend Developer', 'Backend Developer',
+    'DevOps Engineer', 'Data Scientist', 'Machine Learning Engineer', 'Product Manager', 'Project Manager',
+    'UX Designer', 'UI Designer', 'Graphic Designer', 'Marketing Manager', 'Sales Executive',
+    'Business Analyst', 'Data Analyst', 'QA Engineer', 'Test Engineer', 'Cybersecurity Analyst',
+    'Network Engineer', 'System Administrator', 'Database Administrator', 'Cloud Architect', 'Solutions Architect',
+    'Mobile Developer', 'iOS Developer', 'Android Developer', 'Game Developer', 'Web Developer',
+    'Content Writer', 'Technical Writer', 'Copywriter', 'SEO Specialist', 'Digital Marketing Manager',
+    'Social Media Manager', 'Brand Manager', 'Product Designer', 'Industrial Designer', 'Mechanical Engineer',
+    'Electrical Engineer', 'Civil Engineer', 'Chemical Engineer', 'Biomedical Engineer', 'Aerospace Engineer',
+    'Accountant', 'Financial Analyst', 'Investment Banker', 'Tax Consultant', 'Auditor',
+    'HR Manager', 'Recruiter', 'Training Specialist', 'Compensation Analyst', 'Employee Relations Manager',
+    'Operations Manager', 'Supply Chain Manager', 'Logistics Coordinator', 'Procurement Specialist', 'Warehouse Manager',
+    'Customer Service Representative', 'Customer Success Manager', 'Support Engineer', 'Account Manager', 'Sales Manager',
+    'Registered Nurse', 'Physical Therapist', 'Medical Assistant', 'Pharmacist', 'Laboratory Technician',
+    'Teacher', 'Professor', 'Instructional Designer', 'Academic Advisor', 'School Counselor',
+    'Lawyer', 'Paralegal', 'Legal Assistant', 'Compliance Officer', 'Contract Manager',
+    'Chef', 'Restaurant Manager', 'Sous Chef', 'Bartender', 'Server',
+    'Retail Manager', 'Store Manager', 'Sales Associate', 'Cashier', 'Merchandiser',
+    'Real Estate Agent', 'Property Manager', 'Leasing Consultant', 'Appraiser', 'Mortgage Broker',
+    'Construction Manager', 'Architect', 'Interior Designer', 'Carpenter', 'Electrician',
+    'Journalist', 'Editor', 'Videographer', 'Photographer', 'Producer',
+    'Research Scientist', 'Lab Manager', 'Clinical Research Coordinator', 'Statistician', 'Epidemiologist'
+  ];
+
+  const categories = ['Technology', 'Engineering', 'Design', 'Marketing', 'Sales', 'Finance', 'HR', 'Healthcare', 'Customer Service', 'Other'];
+  const experienceLevels = ['entry', 'mid', 'senior'];
+  const employmentTypes = ['full-time', 'part-time', 'contract', 'internship'];
+  const locationTypes = ['remote', 'onsite', 'hybrid'];
+  
+  const skillSets = {
+    Technology: ['JavaScript', 'Python', 'Java', 'React', 'Node.js', 'AWS', 'Docker', 'Kubernetes', 'SQL', 'MongoDB', 'Git', 'TypeScript'],
+    Engineering: ['CAD', 'AutoCAD', 'SolidWorks', 'MATLAB', 'Python', 'Project Management', 'Quality Assurance', 'Testing'],
+    Design: ['Figma', 'Adobe XD', 'Photoshop', 'Illustrator', 'Sketch', 'InDesign', 'UI/UX', 'Prototyping'],
+    Marketing: ['SEO', 'SEM', 'Google Analytics', 'Social Media', 'Content Marketing', 'Email Marketing', 'CRM'],
+    Sales: ['Salesforce', 'CRM', 'Lead Generation', 'Negotiation', 'Cold Calling', 'B2B Sales', 'Account Management'],
+    Finance: ['Excel', 'Financial Modeling', 'QuickBooks', 'GAAP', 'Tax Preparation', 'Forecasting', 'Budgeting'],
+    HR: ['Recruitment', 'HRIS', 'Employee Relations', 'Benefits', 'Compliance', 'Performance Management'],
+    Healthcare: ['Patient Care', 'EMR', 'HIPAA', 'Medical Procedures', 'Clinical Skills', 'Healthcare Management'],
+    'Customer Service': ['Customer Support', 'Communication', 'Problem Solving', 'CRM', 'Conflict Resolution'],
+    Other: ['Communication', 'Leadership', 'Project Management', 'Problem Solving', 'Team Collaboration']
+  };
+
+  const cities = [
+    'New York, NY', 'Los Angeles, CA', 'Chicago, IL', 'Houston, TX', 'Phoenix, AZ', 'Philadelphia, PA',
+    'San Antonio, TX', 'San Diego, CA', 'Dallas, TX', 'San Jose, CA', 'Austin, TX', 'Jacksonville, FL',
+    'Fort Worth, TX', 'Columbus, OH', 'Charlotte, NC', 'San Francisco, CA', 'Indianapolis, IN', 'Seattle, WA',
+    'Denver, CO', 'Washington, DC', 'Boston, MA', 'Nashville, TN', 'Detroit, MI', 'Portland, OR',
+    'Las Vegas, NV', 'Memphis, TN', 'Louisville, KY', 'Baltimore, MD', 'Milwaukee, WI', 'Atlanta, GA',
+    'Miami, FL', 'Remote', 'Tampa, FL', 'Minneapolis, MN', 'Orlando, FL', 'Sacramento, CA', 'Kansas City, MO'
+  ];
+
+  const jobs = [];
+  
+  for (let i = 0; i < numJobs; i++) {
+    const title = jobTitles[i % jobTitles.length];
+    const category = categories[i % categories.length];
+    const experienceLevel = experienceLevels[i % experienceLevels.length];
+    const employmentType = employmentTypes[i % employmentTypes.length];
+    const locationType = locationTypes[i % locationTypes.length];
+    const location = cities[i % cities.length];
+    
+    const baseSalary = experienceLevel === 'entry' ? 50000 : experienceLevel === 'mid' ? 80000 : 120000;
+    const salaryVariation = Math.floor(Math.random() * 20000);
+    
+    const skills = skillSets[category] || skillSets.Other;
+    const selectedSkills = skills.slice(0, 5 + (i % 3));
+    
+    jobs.push({
+      title: `${title} ${i > 99 ? `(${Math.floor(i / 100)})` : ''}`,
+      description: `We are seeking a talented ${title} to join our growing team. This is an excellent opportunity to work on exciting projects and advance your career.`,
+      company: null, // Will be set during seeding
+      location: location,
+      locationType: locationType,
+      employmentType: employmentType,
+      category: category,
+      experienceLevel: experienceLevel,
+      salary: {
+        min: baseSalary + salaryVariation,
+        max: baseSalary + salaryVariation + 30000 + (Math.floor(Math.random() * 20000)),
+        currency: 'USD',
+        period: employmentType === 'part-time' ? 'hourly' : 'yearly'
+      },
+      skills: selectedSkills,
+      requirements: [
+        `${experienceLevel === 'entry' ? '0-2' : experienceLevel === 'mid' ? '3-5' : '5+'} years of relevant experience`,
+        `Strong knowledge of ${selectedSkills[0]} and ${selectedSkills[1]}`,
+        `Excellent communication and teamwork skills`,
+        `Bachelor's degree in relevant field or equivalent experience`
+      ],
+      responsibilities: [
+        `Develop and maintain ${category.toLowerCase()} solutions`,
+        `Collaborate with cross-functional teams`,
+        `Participate in code/design reviews`,
+        `Contribute to project planning and execution`,
+        `Stay updated with industry trends and best practices`
+      ],
+      benefits: ['Health Insurance', '401k', employmentType === 'full-time' ? 'Paid Time Off' : 'Flexible Hours', 'Professional Development'],
+      applicationDeadline: new Date(Date.now() + (30 + (i % 60)) * 24 * 60 * 60 * 1000),
+      status: 'active',
+      isApproved: true
+    });
+  }
+  
+  return jobs;
+}
 
 async function seedDatabase() {
   try {
@@ -833,21 +954,35 @@ async function seedDatabase() {
     await Job.deleteMany({});
     console.log('Cleared existing jobs');
 
-    // Create jobs
-    console.log('Creating jobs...');
-    for (let i = 0; i < sampleJobs.length; i++) {
-      const jobData = sampleJobs[i];
-      jobData.postedBy = recruiter._id;
-      jobData.company = companies[i % companies.length]._id; // Distribute jobs across companies
+    // Generate 1200 jobs
+    console.log('Generating jobs...');
+    const generatedJobs = generateJobs(1200, companies);
+    
+    // Add sample jobs to the beginning
+    const allJobs = [...sampleJobs, ...generatedJobs];
+    
+    // Create jobs in batches for better performance
+    console.log('Creating jobs in database...');
+    const batchSize = 100;
+    let createdCount = 0;
+    
+    for (let i = 0; i < allJobs.length; i += batchSize) {
+      const batch = allJobs.slice(i, i + batchSize);
+      const jobsToCreate = batch.map(jobData => ({
+        ...jobData,
+        postedBy: recruiter._id,
+        company: companies[Math.floor(Math.random() * companies.length)]._id
+      }));
       
-      const job = await Job.create(jobData);
-      console.log(`Created job: ${job.title}`);
+      await Job.insertMany(jobsToCreate);
+      createdCount += jobsToCreate.length;
+      console.log(`Created ${createdCount}/${allJobs.length} jobs...`);
     }
 
     console.log('\n✅ Database seeding completed successfully!');
     console.log(`\nCreated:`);
     console.log(`- ${companies.length} companies`);
-    console.log(`- ${sampleJobs.length} jobs`);
+    console.log(`- ${createdCount} jobs`);
     console.log(`\nRecruiter credentials:`);
     console.log(`Email: recruiter@example.com`);
     console.log(`Password: Password123!`);

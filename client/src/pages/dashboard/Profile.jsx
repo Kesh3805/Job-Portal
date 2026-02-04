@@ -214,6 +214,41 @@ const Profile = () => {
     }
   };
 
+  const handleAvatarUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // Validate file type
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+    if (!allowedTypes.includes(file.type)) {
+      toast.error('Please upload a valid image file (JPEG, PNG, GIF, or WebP)');
+      e.target.value = '';
+      return;
+    }
+
+    // Validate file size (max 2MB)
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error('Image size must be less than 2MB');
+      e.target.value = '';
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('avatar', file);
+
+    try {
+      const { data } = await api.put('/users/avatar', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      toast.success('Avatar updated successfully!');
+      dispatch(getMe());
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Failed to upload avatar');
+    }
+    // Clear the input
+    e.target.value = '';
+  };
+
   return (
     <div className="min-h-screen pt-24 pb-12 relative overflow-hidden">
       {/* Background Blobs */}

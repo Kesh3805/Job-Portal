@@ -46,8 +46,8 @@ const Jobs = () => {
     dispatch(fetchJobs(clearedFilters));
   };
 
-  const employmentTypes = ['Full-time', 'Part-time', 'Contract', 'Freelance', 'Internship'];
-  const experienceLevels = ['Entry Level', 'Mid Level', 'Senior Level', 'Lead', 'Executive'];
+  const employmentTypes = ['full-time', 'part-time', 'contract', 'internship', 'temporary'];
+  const experienceLevels = ['entry', 'mid', 'senior', 'lead', 'executive'];
   const salaryRanges = [
     { label: 'Any', value: '' },
     { label: '$30k+', value: '30000' },
@@ -145,7 +145,7 @@ const Jobs = () => {
                       <button
                         key={type}
                         onClick={() => handleFilterChange('employmentType', filters.employmentType === type ? '' : type)}
-                        className={`px-4 py-2 rounded-lg border transition-all hover-scale ${
+                        className={`px-4 py-2 rounded-lg border transition-all hover-scale capitalize ${
                           filters.employmentType === type
                             ? 'bg-primary text-white border-primary'
                             : 'bg-background/50 border-border hover:border-primary/50'
@@ -168,7 +168,7 @@ const Jobs = () => {
                       <button
                         key={level}
                         onClick={() => handleFilterChange('experienceLevel', filters.experienceLevel === level ? '' : level)}
-                        className={`px-4 py-2 rounded-lg border transition-all hover-scale ${
+                        className={`px-4 py-2 rounded-lg border transition-all hover-scale capitalize ${
                           filters.experienceLevel === level
                             ? 'bg-primary text-white border-primary'
                             : 'bg-background/50 border-border hover:border-primary/50'
